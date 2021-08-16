@@ -26,7 +26,7 @@ const cadastrarUsuario = async (req, res) => {
     //verifica se o email inserido no cadastro já não está cadastrado
     const q1 = `select * from usuarios
                 where email = $1`;
-    const verificarEmail = await query(q1,[email]);
+    const verificarEmail = await query(q1, [email]);
 
     if (verificarEmail.rowCount > 0) {
       res.status(400).json(`E-mail já está cadastrado.`);
@@ -37,7 +37,7 @@ const cadastrarUsuario = async (req, res) => {
     const hash = (await pwd.hash(Buffer.from(senha))).toString('hex');
     const q2 = `insert into usuarios (nome, email, senha)
                 values ($1, $2, $3)`;
-    const cadastro = query(q2,[nome, email, hash]);
+    const cadastro = query(q2, [nome, email, hash]);
 
     //verifica se houve retorno da query, avisando erro caso não tenha dado resultado
     if (cadastro.rowCount === 0) {
@@ -53,8 +53,6 @@ const cadastrarUsuario = async (req, res) => {
     return;
   }
 }
-
-
 
 module.exports = {
   cadastrarUsuario
