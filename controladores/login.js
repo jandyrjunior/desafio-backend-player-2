@@ -19,7 +19,7 @@ const logarUsuario = async (req, res) => {
   }
 
   try {
-    const q1 = `select * from usuarios
+    const q1 = `select * from usuario
                   where email = $1`;
     const cadastro = await query(q1, [email]);
 
@@ -29,7 +29,7 @@ const logarUsuario = async (req, res) => {
       return;
     }
 
-    const usuario = cadastro.row[0];
+    const usuario = cadastro.rows[0];
 
     //compara a senha inserida no login com o hash cadastrado no banco
     const result = await pwd.verify(Buffer.from(senha), Buffer.from(usuario.senha, 'hex'));
@@ -45,7 +45,7 @@ const logarUsuario = async (req, res) => {
       case securePassword.VALID_NEEDS_REHASH:
         try {
           const hash = (await pwd.hash(Buffer.from(senha))).toString('hex');
-          const q2 = `update usuarios
+          const q2 = `update usuario
                            set senha = $1
                            where email = $2`
           await query(q2, [hash, email]);

@@ -1,4 +1,5 @@
 const express = require('express');
+const { listarEmpresasCadastradas, editarEmpresa, excluirEmpresa } = require('./controladores/empresas');
 const { logarUsuario } = require('./controladores/login');
 const { cadastrarUsuario, acessarPerfil, alterarPerfil } = require('./controladores/usuarios');
 const verificarLogin = require('./filtros/verificarLogin');
@@ -15,5 +16,10 @@ rotas.use(verificarLogin);
 //usuarios
 rotas.get('/perfil', acessarPerfil);
 rotas.put('/perfil', alterarPerfil);
+
+//empresas
+rotas.get('/empresas', listarEmpresasCadastradas);
+rotas.patch('/empresas', editarEmpresa);
+rotas.delete('/empresas', excluirEmpresa);
 
 module.exports = rotas;

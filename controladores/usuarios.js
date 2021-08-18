@@ -24,7 +24,7 @@ const cadastrarUsuario = async (req, res) => {
 
   try {
     //verifica se o email inserido no cadastro já não está cadastrado
-    const q1 = `select * from usuarios
+    const q1 = `select * from usuario
                 where email = $1`;
     const verificarEmail = await query(q1, [email]);
 
@@ -35,7 +35,7 @@ const cadastrarUsuario = async (req, res) => {
 
     //transforma a senha inserida no cadastro em um hash
     const hash = (await pwd.hash(Buffer.from(senha))).toString('hex');
-    const q2 = `insert into usuarios (nome, email, senha)
+    const q2 = `insert into usuario (nome, email, senha)
                 values ($1, $2, $3)`;
     const cadastro = query(q2, [nome, email, hash]);
 
@@ -77,7 +77,7 @@ const alterarPerfil = async (req, res) => {
 
   try {
     if (email) {
-      const consultaEmail = await query(`select * from usuarios where email = $1`, [email]);
+      const consultaEmail = await query(`select * from usuario where email = $1`, [email]);
 
       if (consultaEmail.rowCount > 0) {
         res.status(400).json('Não foi possível realizar as alterações. Email já cadastrado.');
@@ -98,9 +98,9 @@ const alterarPerfil = async (req, res) => {
       email = dadosUsuario.email;
     }
     if (!senha) {
-      const q1 = `update usuarios 
+      const q1 = `update usuario 
       set nome = $1, nome_loja = $2, email = $3
-      where usuarios.id = $4`
+      where usuario.id = $4`
 
       const dadosAtualziados = await query(q1, [nome, email, dadosUsuario.id]);
 
@@ -114,9 +114,9 @@ const alterarPerfil = async (req, res) => {
     }
 
     const novoHash = (await pwd.hash(Buffer.from(senha))).toString('hex');
-    const q2 = `update usuarios 
+    const q2 = `update usuario 
     set nome = $1, email = $2, senha = $3
-    where usuarios.id = $4`
+    where usuario.id = $4`
 
     const dadosAtualziados = await query(q2, [nome, email, novoHash, dadosUsuario.id]);
 
