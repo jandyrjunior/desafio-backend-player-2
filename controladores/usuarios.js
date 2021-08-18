@@ -1,7 +1,5 @@
 const { query } = require('../conexao');
 const securePassword = require('secure-password');
-const jwt = require('jsonwebtoken');
-const jwtSecret = require('../jwt_secret');
 
 const pwd = securePassword();
 

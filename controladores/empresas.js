@@ -1,9 +1,51 @@
 const { query } = require('../conexao');
-const securePassword = require('secure-password');
-const jwt = require('jsonwebtoken');
-const jwtSecret = require('../jwt_secret');
+const axios = require('axios');
 
-const pwd = securePassword();
+const cadastrarEmpresa = async (req, res) => {
+  const { cnpj_pesquisado } = req.body;
+  const { senha, ...dadosUsuario } = await req.usuario;
+  
+  if (!dadosUsuario) {
+    res.status(400).json('Usuário precisa ser informado.');
+    return;
+  }
+
+  if (!cnpj_pesquisado) {
+    res.status(400).json(`O CNPJ é obrigatório.`);
+    return;
+  }
+
+  const urlBase = `https://brasilapi.com.br/api/cnpj/v1/${cnpj_pesquisado}`;
+
+  try {
+    const q1 = `select * from empresas where cnpj = $1`;
+    const empresaPesquisada = await query(q1, [cnpj_pesquisado]);
+
+    if (empresaPesquisada.rowCount > 0) {
+      res.status(400).json(`Empresa já está cadastrada.`);
+      return;
+    }
+
+    const resposta = await axios.get(urlBase);
+    
+    const { cnpj, razao_social, nome_fantasia, ddd_telefone_1 } = resposta.data;
+
+    const q2 = `insert into empresas (cnpj, razao_social, nome_fantasia, ddd_telefone_1)
+                values ($1, $2, $3, $4)`
+    const empresaCadastrada = await query(q2, [cnpj, razao_social, nome_fantasia, ddd_telefone_1]);
+    
+    if (empresaCadastrada.rowCount === 0) {
+      res.status(400).json(`Não foi possível cadastrar a empresa.`);
+      return;
+    }
+
+    res.json(`Empresa cadastrada com sucesso.`);
+    return;
+  } catch (error) {
+    res.status(400).json(`CNPJ não encontrado. Não foi possível cadastrar a empresa.`);
+    return;
+  }
+}
 
 const listarEmpresasCadastradas = async (req, res) => {
   const { senha, ...dadosUsuario } = await req.usuario;
@@ -128,5 +170,6 @@ const excluirEmpresa = async (req, res) => {
 module.exports = {
   listarEmpresasCadastradas,
   editarEmpresa,
-  excluirEmpresa
+  excluirEmpresa,
+  cadastrarEmpresa
 }
